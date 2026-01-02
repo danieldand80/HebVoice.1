@@ -4,8 +4,11 @@ import { useState } from 'react'
 import { Volume2, Zap, Shield, Globe } from 'lucide-react'
 import AuthButton from '@/components/AuthButton'
 import ThemeToggle from '@/components/ThemeToggle'
+import LanguageToggle from '@/components/LanguageToggle'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function LandingPage() {
+  const { t } = useTranslation()
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Header */}
@@ -18,6 +21,7 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <ThemeToggle />
             <AuthButton />
           </div>
@@ -28,13 +32,13 @@ export default function LandingPage() {
       <main className="container mx-auto px-4 py-20">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            המרת טקסט לדיבור בעברית
+            {t('title')}
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
-            הכלי היחיד בישראל שמשתמש בטכנולוגיה המתקדמת של Google AI
+            {t('subtitle')}
           </p>
           <p className="text-lg text-gray-500 dark:text-gray-400 mb-12">
-            קולות טבעיים, איכות מקצועית, קל לשימוש
+            {t('description')}
           </p>
           
           <AuthButton />
@@ -44,31 +48,31 @@ export default function LandingPage() {
         <div className="grid md:grid-cols-3 gap-8 mt-20">
           <FeatureCard
             icon={<Zap className="w-12 h-12 text-purple-600" />}
-            title="מהיר ופשוט"
-            description="הדבק טקסט, בחר קול, והורד את הקובץ תוך שניות"
+            title={t('fastSimple')}
+            description={t('fastSimpleDesc')}
           />
           <FeatureCard
             icon={<Shield className="w-12 h-12 text-purple-600" />}
-            title="איכות גבוהה"
-            description="טכנולוגיית Google AI המתקדמת ביותר לדיבור טבעי"
+            title={t('highQuality')}
+            description={t('highQualityDesc')}
           />
           <FeatureCard
             icon={<Globe className="w-12 h-12 text-purple-600" />}
-            title="תמיכה בעברית"
-            description="הכלי היחיד בישראל עם קולות עבריים מקצועיים"
+            title={t('hebrewSupport')}
+            description={t('hebrewSupportDesc')}
           />
         </div>
 
         {/* Demo Section */}
         <div className="mt-20 max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
-          <h2 className="text-2xl font-bold mb-6 text-center dark:text-white">נסה עכשיו בחינם</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center dark:text-white">{t('tryNow')}</h2>
           <DemoForm />
         </div>
       </main>
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 text-center text-gray-500 dark:text-gray-400 border-t dark:border-gray-700 mt-20">
-        <p>© 2026 HebVoice. כל הזכויות שמורות.</p>
+        <p>{t('rights')}</p>
       </footer>
     </div>
   )
@@ -86,27 +90,28 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 
 function DemoForm() {
   const [text, setText] = useState('')
+  const { t } = useTranslation()
 
   return (
     <div className="space-y-4">
       <textarea
         className="w-full h-32 p-4 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none"
-        placeholder="הדבק טקסט בעברית כאן..."
+        placeholder={t('placeholder')}
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
       
       <div className="flex gap-4">
         <select className="flex-1 p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none">
-          <option>קול 1 - גבר</option>
-          <option>קול 2 - אישה</option>
-          <option>קול 3 - ילד</option>
+          <option>Voice 1 - Male</option>
+          <option>Voice 2 - Female</option>
+          <option>Voice 3 - Young</option>
         </select>
         
         <select className="flex-1 p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none">
-          <option>מהירות רגילה</option>
-          <option>מהירות איטית</option>
-          <option>מהירות מהירה</option>
+          <option>Normal Speed</option>
+          <option>Slow Speed</option>
+          <option>Fast Speed</option>
         </select>
       </div>
       
@@ -114,11 +119,11 @@ function DemoForm() {
         className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition disabled:opacity-50"
         disabled={!text.trim()}
       >
-        צור קול
+        {t('createVoice')}
       </button>
       
       <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-        התחבר כדי לשמור ולהוריד את הקבצים שלך
+        {t('loginToSave')}
       </p>
     </div>
   )

@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'HebVoice - המרת טקסט לדיבור בעברית',
-  description: 'הכלי הטוב ביותר להמרת טקסט לדיבור בעברית באיכות גוגל',
+  title: 'HebVoice - Hebrew Text to Speech Converter',
+  description: 'The best tool for converting Hebrew text to speech with Google quality',
 }
 
 export default function RootLayout({
