@@ -1,8 +1,11 @@
 'use client'
 
 import { supabase } from '@/lib/supabase'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function AuthButton() {
+  const { t } = useTranslation()
+
   const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -17,7 +20,7 @@ export default function AuthButton() {
       onClick={handleGoogleLogin}
       className="px-6 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition"
     >
-      התחבר עם Google
+      {t('loginButton')}
     </button>
   )
 }
