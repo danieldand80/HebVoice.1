@@ -24,6 +24,8 @@ export const translations = {
     loginToSave: 'התחבר כדי לשמור ולהוריד את הקבצים שלך',
     pleaseLogin: 'אנא התחבר קודם כדי ליצור קולות',
     toGenerateVoice: 'כדי ליצור קול, התחבר עם Google',
+    goToDashboard: 'עבור ל-Dashboard',
+    loggedInMessage: 'התחברת בהצלחה! עבור ל-Dashboard כדי ליצור קולות',
     
     // Dashboard
     createNew: 'צור קול חדש',
@@ -67,6 +69,8 @@ export const translations = {
     loginToSave: 'Login to save and download your files',
     pleaseLogin: 'Please login first to create voices',
     toGenerateVoice: 'To generate voice, login with Google',
+    goToDashboard: 'Go to Dashboard',
+    loggedInMessage: "You're logged in! Go to Dashboard to create voices",
     
     // Dashboard
     createNew: 'Create New Voice',

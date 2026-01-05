@@ -131,41 +131,22 @@ function DemoForm() {
     )
   }
 
-  // If authenticated - show full form
+  // If authenticated - show dashboard button
   return (
-    <div className="space-y-4">
-      <textarea
-        className="w-full h-32 p-4 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none"
-        placeholder={t('placeholder')}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      
-      <div className="flex gap-4">
-        <select className="flex-1 p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none">
-          <option>Voice 1 - Male</option>
-          <option>Voice 2 - Female</option>
-          <option>Voice 3 - Young</option>
-        </select>
-        
-        <select className="flex-1 p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none">
-          <option>Normal Speed</option>
-          <option>Slow Speed</option>
-          <option>Fast Speed</option>
-        </select>
+    <div className="text-center py-12">
+      <div className="mb-6">
+        <div className="inline-block p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg mb-4">
+          <p className="text-green-800 dark:text-green-200 font-medium">
+            ✓ {t('loggedInMessage')}
+          </p>
+        </div>
       </div>
-
-      <button 
+      <button
         onClick={handleCreateVoice}
-        className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition disabled:opacity-50"
-        disabled={!text.trim()}
+        className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-medium rounded-full hover:shadow-xl transition transform hover:scale-105"
       >
-        {t('createVoice')}
+        {t('goToDashboard')} →
       </button>
-      
-      <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-        {t('loginToSave')}
-      </p>
     </div>
   )
 }
