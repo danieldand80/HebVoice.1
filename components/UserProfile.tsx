@@ -1,17 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
 import { LogOut, User as UserIcon } from 'lucide-react'
 import { useTranslation } from '@/hooks/useTranslation'
-import { useRouter } from 'next/navigation'
 
 export default function UserProfile() {
   const [user, setUser] = useState<User | null>(null)
   const [showMenu, setShowMenu] = useState(false)
   const { t } = useTranslation()
-  const router = useRouter()
 
   useEffect(() => {
     // Get initial user
@@ -30,12 +29,7 @@ export default function UserProfile() {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     setShowMenu(false)
-    router.push('/')
-  }
-
-  const goToDashboard = () => {
-    setShowMenu(false)
-    router.push('/dashboard')
+    window.location.href = '/'
   }
 
   if (!user) {
@@ -83,12 +77,13 @@ export default function UserProfile() {
               </p>
             </div>
             <div className="p-2">
-              <button
-                onClick={goToDashboard}
-                className="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white transition"
+              <Link
+                href="/dashboard"
+                onClick={() => setShowMenu(false)}
+                className="block w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white transition"
               >
                 Dashboard
-              </button>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-3 py-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-600 dark:text-red-400 transition flex items-center gap-2"
