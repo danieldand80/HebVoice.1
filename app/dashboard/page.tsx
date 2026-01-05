@@ -23,18 +23,28 @@ export default function DashboardPage() {
     loadHistory()
   }, [])
 
-  const loadHistory = async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+  const loadHistory = () => {
+    // Load history from sessionStorage
+    const savedHistory = sessionStorage.getItem('tts_history')
+    if (savedHistory) {
+      setHistory(JSON.parse(savedHistory))
+    }
+  }
 
-    const { data } = await supabase
-      .from('tts_requests')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(10)
-
-    if (data) setHistory(data)
+  const saveToHistory = (text: string, audioBase64: string, voice: string, speed: number) => {
+    const newItem = {
+      id: Date.now().toString(),
+      text: text.substring(0, 100),
+      audio_url: audioBase64,
+      voice,
+      speed,
+      character_count: text.length,
+      created_at: new Date().toISOString(),
+    }
+    
+    const updatedHistory = [newItem, ...history]
+    setHistory(updatedHistory)
+    sessionStorage.setItem('tts_history', JSON.stringify(updatedHistory))
   }
 
   const handleGenerate = async () => {
@@ -45,8 +55,6 @@ export default function DashboardPage() {
     setAudioBase64(null)
 
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      
       const response = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,7 +62,6 @@ export default function DashboardPage() {
           text,
           voice,
           speed,
-          userId: user?.id
         })
       })
 
@@ -66,7 +73,7 @@ export default function DashboardPage() {
 
       if (result.success && result.audioBase64) {
         setAudioBase64(result.audioBase64)
-        loadHistory()
+        saveToHistory(text, result.audioBase64, voice, speed)
       } else {
         throw new Error('No audio generated')
       }
@@ -114,57 +121,34 @@ export default function DashboardPage() {
   const handlePlayHistoryAudio = (audioUrl: string) => {
     if (!audioUrl) return
     
-    // If it's a Supabase Storage URL, use it directly
-    if (audioUrl.startsWith('http')) {
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl
-        audioRef.current.play()
-      }
-    } else {
-      // Fallback for old base64 format
-      const audioBlob = new Blob(
-        [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
-        { type: 'audio/mp3' }
-      )
-      const url = URL.createObjectURL(audioBlob)
-      
-      if (audioRef.current) {
-        audioRef.current.src = url
-        audioRef.current.play()
-      }
+    // Play from base64
+    const audioBlob = new Blob(
+      [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
+      { type: 'audio/mp3' }
+    )
+    const url = URL.createObjectURL(audioBlob)
+    
+    if (audioRef.current) {
+      audioRef.current.src = url
+      audioRef.current.play()
     }
   }
 
-  const handleDownloadHistoryAudio = async (audioUrl: string, id: string) => {
+  const handleDownloadHistoryAudio = (audioUrl: string, id: string) => {
     if (!audioUrl) return
     
-    if (audioUrl.startsWith('http')) {
-      // Download from Supabase Storage URL
-      const response = await fetch(audioUrl)
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `hebvoice-${id}.mp3`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    } else {
-      // Fallback for old base64 format
-      const audioBlob = new Blob(
-        [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
-        { type: 'audio/mp3' }
-      )
-      const url = URL.createObjectURL(audioBlob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `hebvoice-${id}.mp3`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-    }
+    const audioBlob = new Blob(
+      [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
+      { type: 'audio/mp3' }
+    )
+    const url = URL.createObjectURL(audioBlob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `hebvoice-${id}.mp3`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const handleLogout = async () => {
@@ -295,10 +279,13 @@ export default function DashboardPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2 dark:text-white">
+              <h3 className="text-xl font-bold mb-2 flex items-center gap-2 dark:text-white">
                 <History size={24} />
                 {t('history')}
               </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                {t('historyNote')}
+              </p>
 
               <div className="space-y-3">
                 {history.length === 0 ? (
