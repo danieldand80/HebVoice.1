@@ -10,12 +10,18 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Protected routes
-  if (req.nextUrl.pathname.startsWith('/dashboard')) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
-  }
+  console.log('Middleware:', {
+    path: req.nextUrl.pathname,
+    hasSession: !!session,
+    user: session?.user?.email
+  })
+
+  // Temporarily disable redirect to test
+  // if (req.nextUrl.pathname.startsWith('/dashboard')) {
+  //   if (!session) {
+  //     return NextResponse.redirect(new URL('/', req.url))
+  //   }
+  // }
 
   return res
 }
