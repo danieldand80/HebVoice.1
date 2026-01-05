@@ -151,7 +151,7 @@ export default function DashboardPage() {
               <h2 className="text-2xl font-bold mb-6 dark:text-white">{t('createNew')}</h2>
               
               <textarea
-                className="w-full h-48 p-4 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none mb-2 resize-none"
+                className="w-full h-48 p-4 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 focus:outline-none mb-2 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 placeholder={t('pasteText')}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -163,27 +163,27 @@ export default function DashboardPage() {
 
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 dark:text-gray-200">{t('selectVoice')}</label>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200">{t('selectVoice')}</label>
                   <select
-                    className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none"
+                    className="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 focus:outline-none cursor-pointer"
                     value={voice}
                     onChange={(e) => setVoice(e.target.value)}
                   >
                     {VOICES.map(v => (
-                      <option key={v.id} value={v.id}>{v.name}</option>
+                      <option key={v.id} value={v.id} className="text-gray-900 dark:text-white bg-white dark:bg-gray-700">{v.name}</option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 dark:text-gray-200">{t('selectSpeed')}</label>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200">{t('selectSpeed')}</label>
                   <select
-                    className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none"
+                    className="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 focus:outline-none cursor-pointer"
                     value={speed}
                     onChange={(e) => setSpeed(Number(e.target.value))}
                   >
                     {SPEEDS.map(s => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
+                      <option key={s.id} value={s.id} className="text-gray-900 dark:text-white bg-white dark:bg-gray-700">{s.name}</option>
                     ))}
                   </select>
                 </div>
@@ -253,16 +253,16 @@ export default function DashboardPage() {
                   history.map((item) => (
                     <div
                       key={item.id}
-                      className="p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-purple-500 cursor-pointer transition"
+                      className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer transition"
                     >
-                      <p className="text-sm font-medium truncate mb-1 dark:text-gray-200">
+                      <p className="text-sm font-medium truncate mb-1 text-gray-900 dark:text-gray-200">
                         {item.text || 'קול ללא טקסט'}
                       </p>
                       <div className="flex justify-between items-center">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
                           {new Date(item.created_at).toLocaleDateString('he-IL')}
                         </p>
-                        <p className="text-xs text-purple-600 dark:text-purple-400">
+                        <p className="text-xs font-medium text-purple-600 dark:text-purple-400">
                           {item.character_count} {t('characters')}
                         </p>
                       </div>
