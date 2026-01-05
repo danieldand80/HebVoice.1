@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Volume2, Zap, Shield, Globe } from 'lucide-react'
 import AuthSection from '@/components/AuthSection'
 import ThemeToggle from '@/components/ThemeToggle'
 import LanguageToggle from '@/components/LanguageToggle'
 import { useTranslation } from '@/hooks/useTranslation'
+import { supabase } from '@/lib/supabase'
 
 export default function LandingPage() {
   const { t } = useTranslation()
@@ -89,11 +90,31 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 function DemoForm() {
   const [text, setText] = useState('')
   const [showLoginWarning, setShowLoginWarning] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const { t } = useTranslation()
 
+  useEffect(() => {
+    // Check auth status
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsAuthenticated(!!user)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session?.user)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
   const handleCreateVoice = () => {
-    setShowLoginWarning(true)
-    setTimeout(() => setShowLoginWarning(false), 3000)
+    if (isAuthenticated) {
+      // Redirect to dashboard if logged in
+      window.location.href = '/dashboard'
+    } else {
+      // Show login warning if not logged in
+      setShowLoginWarning(true)
+      setTimeout(() => setShowLoginWarning(false), 3000)
+    }
   }
 
   return (
@@ -135,9 +156,11 @@ function DemoForm() {
         {t('createVoice')}
       </button>
       
-      <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-        {t('loginToSave')}
-      </p>
+      {!isAuthenticated && (
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+          {t('loginToSave')}
+        </p>
+      )}
     </div>
   )
 }
