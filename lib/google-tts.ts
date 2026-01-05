@@ -1,4 +1,4 @@
-// Google Cloud Text-to-Speech integration
+// Google Cloud Text-to-Speech integration with Chirp 3 HD
 // Docs: https://cloud.google.com/text-to-speech/docs
 
 export async function generateSpeech(
@@ -7,7 +7,7 @@ export async function generateSpeech(
   speed: number
 ): Promise<{ success: boolean; audioBase64?: string; error?: string }> {
   try {
-    // Use Google Cloud TTS REST API
+    // Use Google Cloud TTS REST API with Chirp 3 HD
     const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.GOOGLE_CLOUD_API_KEY
     
     if (!apiKey) {
@@ -57,16 +57,22 @@ export async function generateSpeech(
   }
 }
 
-// Available Hebrew voices in Google Cloud TTS
+// Available Hebrew Chirp 3 HD voices - Premium quality
 export const VOICES = [
-  { id: 'he-IL-Wavenet-A', name: 'דוד - גבר (Wavenet)' },
-  { id: 'he-IL-Wavenet-B', name: 'שרה - אישה (Wavenet)' },
-  { id: 'he-IL-Wavenet-C', name: 'רות - אישה (Wavenet)' },
-  { id: 'he-IL-Wavenet-D', name: 'יוסי - גבר (Wavenet)' },
-  { id: 'he-IL-Standard-A', name: 'דוד - גבר (Standard)' },
-  { id: 'he-IL-Standard-B', name: 'שרה - אישה (Standard)' },
-  { id: 'he-IL-Standard-C', name: 'רות - אישה (Standard)' },
-  { id: 'he-IL-Standard-D', name: 'יוסי - גבר (Standard)' },
+  // Male voices (גברים)
+  { id: 'he-IL-Chirp3-HD-Enceladus', name: 'Enceladus - גבר (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Fenrir', name: 'Fenrir - גבר (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Iapetus', name: 'Iapetus - גבר (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Orus', name: 'Orus - גבר (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Puck', name: 'Puck - גבר (איכות גבוהה)' },
+  
+  // Female voices (נשים)
+  { id: 'he-IL-Chirp3-HD-Erinome', name: 'Erinome - אישה (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Gacrux', name: 'Gacrux - אישה (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Kore', name: 'Kore - אישה (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Laomedeia', name: 'Laomedeia - אישה (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Leda', name: 'Leda - אישה (איכות גבוהה)' },
+  { id: 'he-IL-Chirp3-HD-Pulcherrima', name: 'Pulcherrima - אישה (איכות גבוהה)' },
 ]
 
 export const SPEEDS = [

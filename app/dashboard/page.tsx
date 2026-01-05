@@ -18,7 +18,6 @@ export default function DashboardPage() {
   const [history, setHistory] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [useGemini, setUseGemini] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
@@ -122,7 +121,6 @@ export default function DashboardPage() {
           text,
           voice,
           speed,
-          useGemini,
         })
       })
 
@@ -274,21 +272,6 @@ export default function DashboardPage() {
               />
               <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-left">
                 {text.length} / 5000 {t('charactersCount')}
-              </div>
-
-              {/* Experimental Gemini Toggle */}
-              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={useGemini}
-                    onChange={(e) => setUseGemini(e.target.checked)}
-                    className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
-                  />
-                  <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                    🧪 Test Gemini-TTS (Experimental - may not support Hebrew)
-                  </span>
-                </label>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4 mb-4">

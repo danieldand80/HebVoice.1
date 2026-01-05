@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateSpeech } from '@/lib/google-tts'
-import { generateSpeechGemini } from '@/lib/gemini-tts'
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, voice, speed, useGemini } = await req.json()
+    const { text, voice, speed } = await req.json()
 
     if (!text || !voice || speed === undefined) {
       return NextResponse.json(
@@ -21,10 +20,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Choose TTS engine based on useGemini flag
-    const result = useGemini 
-      ? await generateSpeechGemini(text, voice, speed)
-      : await generateSpeech(text, voice, speed)
+    // Generate speech using Google Cloud TTS Chirp 3 HD
+    const result = await generateSpeech(text, voice, speed)
 
     if (!result.success) {
       return NextResponse.json(
