@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
           voice,
           speed,
           character_count: text.length,
-          audio_url: null, // We're returning base64 directly for now
+          audio_url: result.audioBase64, // Save base64 audio
         })
       } catch (dbError) {
         console.error('Database save error:', dbError)

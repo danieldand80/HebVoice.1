@@ -111,6 +111,38 @@ export default function DashboardPage() {
     URL.revokeObjectURL(url)
   }
 
+  const handlePlayHistoryAudio = (audioBase64: string) => {
+    if (!audioBase64) return
+    
+    const audioBlob = new Blob(
+      [Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))],
+      { type: 'audio/mp3' }
+    )
+    const audioUrl = URL.createObjectURL(audioBlob)
+    
+    if (audioRef.current) {
+      audioRef.current.src = audioUrl
+      audioRef.current.play()
+    }
+  }
+
+  const handleDownloadHistoryAudio = (audioBase64: string, id: string) => {
+    if (!audioBase64) return
+    
+    const audioBlob = new Blob(
+      [Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))],
+      { type: 'audio/mp3' }
+    )
+    const url = URL.createObjectURL(audioBlob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `hebvoice-${id}.mp3`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     window.location.href = '/'
@@ -253,12 +285,12 @@ export default function DashboardPage() {
                   history.map((item) => (
                     <div
                       key={item.id}
-                      className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 cursor-pointer transition"
+                      className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition"
                     >
-                      <p className="text-sm font-medium truncate mb-1 text-gray-900 dark:text-gray-200">
-                        {item.text || 'קול ללא טקסט'}
+                      <p className="text-sm font-medium truncate mb-2 text-gray-900 dark:text-gray-200">
+                        {item.text || 'No text'}
                       </p>
-                      <div className="flex justify-between items-center">
+                      <div className="flex justify-between items-center mb-2">
                         <p className="text-xs text-gray-600 dark:text-gray-400">
                           {new Date(item.created_at).toLocaleDateString('he-IL')}
                         </p>
@@ -266,6 +298,24 @@ export default function DashboardPage() {
                           {item.character_count} {t('characters')}
                         </p>
                       </div>
+                      {item.audio_url && (
+                        <div className="flex gap-2 mt-2">
+                          <button
+                            onClick={() => handlePlayHistoryAudio(item.audio_url)}
+                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition"
+                          >
+                            <Play size={14} />
+                            {t('play')}
+                          </button>
+                          <button
+                            onClick={() => handleDownloadHistoryAudio(item.audio_url, item.id)}
+                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                          >
+                            <Download size={14} />
+                            {t('download')}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
