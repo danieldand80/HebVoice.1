@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [history, setHistory] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [useGemini, setUseGemini] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
@@ -40,28 +41,70 @@ export default function DashboardPage() {
     }
   }, [])
 
-  const loadHistory = () => {
-    // Load history from sessionStorage
-    const savedHistory = sessionStorage.getItem('tts_history')
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory))
+  useEffect(() => {
+    // Cleanup old records on mount
+    cleanupOldRecords()
+  }, [])
+
+  const loadHistory = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Load history from Supabase (last 7 days)
+      const { data, error } = await supabase
+        .from('tts_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50)
+
+      if (error) throw error
+      
+      if (data) {
+        setHistory(data)
+      }
+    } catch (error) {
+      console.error('Error loading history:', error)
     }
   }
 
-  const saveToHistory = (text: string, audioBase64: string, voice: string, speed: number) => {
-    const newItem = {
-      id: Date.now().toString(),
-      text: text.substring(0, 100),
-      audio_url: audioBase64,
-      voice,
-      speed,
-      character_count: text.length,
-      created_at: new Date().toISOString(),
+  const cleanupOldRecords = async () => {
+    try {
+      const { error } = await supabase.rpc('cleanup_old_tts_requests')
+      if (error) console.error('Cleanup error:', error)
+    } catch (error) {
+      console.error('Error cleaning up old records:', error)
     }
-    
-    const updatedHistory = [newItem, ...history]
-    setHistory(updatedHistory)
-    sessionStorage.setItem('tts_history', JSON.stringify(updatedHistory))
+  }
+
+  const saveToHistory = async (text: string, audioBase64: string, voice: string, speed: number) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Save to Supabase
+      const { data, error } = await supabase
+        .from('tts_requests')
+        .insert({
+          user_id: user.id,
+          text: text.substring(0, 500), // Store more text for reference
+          audio_data: audioBase64, // Store base64 audio
+          voice,
+          speed,
+          character_count: text.length,
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+
+      if (data) {
+        setHistory([data, ...history])
+      }
+    } catch (error) {
+      console.error('Error saving to history:', error)
+    }
   }
 
   const handleGenerate = async () => {
@@ -79,6 +122,7 @@ export default function DashboardPage() {
           text,
           voice,
           speed,
+          useGemini,
         })
       })
 
@@ -90,7 +134,7 @@ export default function DashboardPage() {
 
       if (result.success && result.audioBase64) {
         setAudioBase64(result.audioBase64)
-        saveToHistory(text, result.audioBase64, voice, speed)
+        await saveToHistory(text, result.audioBase64, voice, speed)
       } else {
         throw new Error('No audio generated')
       }
@@ -142,8 +186,8 @@ export default function DashboardPage() {
     URL.revokeObjectURL(url)
   }
 
-  const handlePlayHistoryAudio = (audioUrl: string) => {
-    if (!audioUrl) return
+  const handlePlayHistoryAudio = (audioData: string) => {
+    if (!audioData) return
     
     if (isPlaying && audioRef.current) {
       // Pause the audio
@@ -152,7 +196,7 @@ export default function DashboardPage() {
     } else {
       // Play from base64
       const audioBlob = new Blob(
-        [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
+        [Uint8Array.from(atob(audioData), c => c.charCodeAt(0))],
         { type: 'audio/mp3' }
       )
       const url = URL.createObjectURL(audioBlob)
@@ -165,11 +209,11 @@ export default function DashboardPage() {
     }
   }
 
-  const handleDownloadHistoryAudio = (audioUrl: string, id: string) => {
-    if (!audioUrl) return
+  const handleDownloadHistoryAudio = (audioData: string, id: string) => {
+    if (!audioData) return
     
     const audioBlob = new Blob(
-      [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
+      [Uint8Array.from(atob(audioData), c => c.charCodeAt(0))],
       { type: 'audio/mp3' }
     )
     const url = URL.createObjectURL(audioBlob)
@@ -230,6 +274,21 @@ export default function DashboardPage() {
               />
               <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-left">
                 {text.length} / 5000 {t('charactersCount')}
+              </div>
+
+              {/* Experimental Gemini Toggle */}
+              <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={useGemini}
+                    onChange={(e) => setUseGemini(e.target.checked)}
+                    className="w-4 h-4 text-purple-600 bg-gray-100 border-gray-300 rounded focus:ring-purple-500"
+                  />
+                  <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                    🧪 Test Gemini-TTS (Experimental - may not support Hebrew)
+                  </span>
+                </label>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4 mb-4">
@@ -315,7 +374,7 @@ export default function DashboardPage() {
                 {t('history')}
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                {t('historyNote')}
+                {t('historyNote7Days')}
               </p>
 
               <div className="space-y-3">
@@ -340,17 +399,17 @@ export default function DashboardPage() {
                           {item.character_count} {t('characters')}
                         </p>
                       </div>
-                      {item.audio_url && (
+                      {item.audio_data && (
                         <div className="flex gap-2 mt-2">
                           <button
-                            onClick={() => handlePlayHistoryAudio(item.audio_url)}
+                            onClick={() => handlePlayHistoryAudio(item.audio_data)}
                             className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition"
                           >
                             {isPlaying ? <Pause size={14} /> : <Play size={14} />}
                             {isPlaying ? t('pause') : t('play')}
                           </button>
                           <button
-                            onClick={() => handleDownloadHistoryAudio(item.audio_url, item.id)}
+                            onClick={() => handleDownloadHistoryAudio(item.audio_data, item.id)}
                             className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition"
                           >
                             <Download size={14} />

@@ -77,3 +77,4 @@ GROUP BY user_id, DATE_TRUNC('day', created_at);
 
 
 
+

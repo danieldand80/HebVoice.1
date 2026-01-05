@@ -33,3 +33,4 @@ export default function AuthSection() {
   return isAuthenticated ? <UserProfile /> : <AuthButton />
 }
 
+

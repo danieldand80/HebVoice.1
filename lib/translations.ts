@@ -44,6 +44,7 @@ export const translations = {
     pasteText: 'הדבק את הטקסט שלך כאן...',
     charactersCount: 'תווים',
     historyNote: 'ההיסטוריה נשמרת רק במהלך הפעלה זו ותימחק בסגירת הדפדפן',
+    historyNote7Days: 'ההיסטוריה נשמרת למשך 7 ימים ותימחק אוטומטית',
     
     // Footer
     rights: '© 2026 HebVoice. כל הזכויות שמורות.',
@@ -93,6 +94,7 @@ export const translations = {
     pasteText: 'Paste your text here...',
     charactersCount: 'characters',
     historyNote: 'History is saved only during this session and will be deleted when you close the browser',
+    historyNote7Days: 'History is saved for 7 days and will be automatically deleted',
     
     // Footer
     rights: '© 2026 HebVoice. All rights reserved.',
