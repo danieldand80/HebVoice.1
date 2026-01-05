@@ -90,7 +90,13 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 
 function DemoForm() {
   const [text, setText] = useState('')
+  const [showLoginWarning, setShowLoginWarning] = useState(false)
   const { t } = useTranslation()
+
+  const handleCreateVoice = () => {
+    setShowLoginWarning(true)
+    setTimeout(() => setShowLoginWarning(false), 3000)
+  }
 
   return (
     <div className="space-y-4">
@@ -114,8 +120,17 @@ function DemoForm() {
           <option>Fast Speed</option>
         </select>
       </div>
+
+      {showLoginWarning && (
+        <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <p className="text-yellow-800 dark:text-yellow-200 text-center font-medium">
+            ⚠️ {t('pleaseLogin')}
+          </p>
+        </div>
+      )}
       
       <button 
+        onClick={handleCreateVoice}
         className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition disabled:opacity-50"
         disabled={!text.trim()}
       >

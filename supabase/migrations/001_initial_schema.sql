@@ -75,3 +75,5 @@ SELECT
 FROM public.tts_requests
 GROUP BY user_id, DATE_TRUNC('day', created_at);
 
+
+

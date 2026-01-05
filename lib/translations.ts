@@ -22,6 +22,7 @@ export const translations = {
     selectSpeed: 'מהירות דיבור',
     createVoice: 'צור קול',
     loginToSave: 'התחבר כדי לשמור ולהוריד את הקבצים שלך',
+    pleaseLogin: 'אנא התחבר קודם כדי ליצור קולות',
     
     // Dashboard
     createNew: 'צור קול חדש',
@@ -63,6 +64,7 @@ export const translations = {
     selectSpeed: 'Speech Speed',
     createVoice: 'Create Voice',
     loginToSave: 'Login to save and download your files',
+    pleaseLogin: 'Please login first to create voices',
     
     // Dashboard
     createNew: 'Create New Voice',
@@ -85,4 +87,6 @@ export const translations = {
 
 export type Language = 'he' | 'en'
 export type TranslationKey = keyof typeof translations.he
+
+
 
