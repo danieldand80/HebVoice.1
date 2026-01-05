@@ -72,13 +72,17 @@ export default function AdminPage() {
 
   const loadAnalytics = async () => {
     try {
-      // Load analytics from view
+      // Load analytics directly from table
       const { data, error } = await supabase
-        .from('analytics_dashboard')
+        .from('analytics')
         .select('*')
         .order('date', { ascending: false })
+        .limit(30)
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        throw error
+      }
 
       if (data) {
         setAnalytics(data)
@@ -86,6 +90,7 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error('Error loading analytics:', error)
+      alert('Ошибка загрузки аналитики. Проверь консоль браузера (F12).')
     } finally {
       setLoading(false)
     }
