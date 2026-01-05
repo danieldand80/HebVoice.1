@@ -71,7 +71,10 @@ export default function AdminPage() {
   }
 
   const loadAnalytics = async () => {
+    console.log('🔍 Starting loadAnalytics...')
     try {
+      console.log('📡 Fetching from analytics table...')
+      
       // Load analytics directly from table
       const { data, error } = await supabase
         .from('analytics')
@@ -79,19 +82,26 @@ export default function AdminPage() {
         .order('date', { ascending: false })
         .limit(30)
 
+      console.log('📊 Response:', { data, error })
+
       if (error) {
-        console.error('Supabase error:', error)
+        console.error('❌ Supabase error:', error)
         throw error
       }
 
       if (data) {
+        console.log('✅ Analytics loaded:', data.length, 'records')
         setAnalytics(data)
         calculateTotalStats(data)
+      } else {
+        console.warn('⚠️ No data returned')
+        setAnalytics([])
       }
     } catch (error) {
-      console.error('Error loading analytics:', error)
-      alert('Ошибка загрузки аналитики. Проверь консоль браузера (F12).')
+      console.error('💥 Error loading analytics:', error)
+      alert('Ошибка загрузки аналитики: ' + (error as Error).message)
     } finally {
+      console.log('✅ Loading complete, setting loading=false')
       setLoading(false)
     }
   }
