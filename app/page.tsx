@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Volume2, Zap, Shield, Globe } from 'lucide-react'
-import AuthButton from '@/components/AuthButton'
+import AuthSection from '@/components/AuthSection'
 import ThemeToggle from '@/components/ThemeToggle'
 import LanguageToggle from '@/components/LanguageToggle'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -23,7 +23,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <LanguageToggle />
             <ThemeToggle />
-            <AuthButton />
+            <AuthSection />
           </div>
         </nav>
       </header>
