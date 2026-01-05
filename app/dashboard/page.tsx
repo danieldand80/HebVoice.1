@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Volume2, Download, History, Settings, LogOut, Play, Loader2 } from 'lucide-react'
+import { Volume2, Download, History, Settings, LogOut, Play, Pause, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { VOICES, SPEEDS } from '@/lib/google-tts'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -17,10 +17,27 @@ export default function DashboardPage() {
   const [audioBase64, setAudioBase64] = useState<string | null>(null)
   const [history, setHistory] = useState<any[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     loadHistory()
+    
+    // Setup audio event listeners
+    const audio = audioRef.current
+    if (audio) {
+      audio.addEventListener('ended', () => setIsPlaying(false))
+      audio.addEventListener('pause', () => setIsPlaying(false))
+      audio.addEventListener('play', () => setIsPlaying(true))
+    }
+    
+    return () => {
+      if (audio) {
+        audio.removeEventListener('ended', () => setIsPlaying(false))
+        audio.removeEventListener('pause', () => setIsPlaying(false))
+        audio.removeEventListener('play', () => setIsPlaying(true))
+      }
+    }
   }, [])
 
   const loadHistory = () => {
@@ -88,16 +105,23 @@ export default function DashboardPage() {
   const handlePlayAudio = () => {
     if (!audioBase64) return
     
-    // Convert base64 to audio URL
-    const audioBlob = new Blob(
-      [Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))],
-      { type: 'audio/mp3' }
-    )
-    const audioUrl = URL.createObjectURL(audioBlob)
-    
-    if (audioRef.current) {
-      audioRef.current.src = audioUrl
-      audioRef.current.play()
+    if (isPlaying && audioRef.current) {
+      // Pause the audio
+      audioRef.current.pause()
+      setIsPlaying(false)
+    } else {
+      // Convert base64 to audio URL and play
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))],
+        { type: 'audio/mp3' }
+      )
+      const audioUrl = URL.createObjectURL(audioBlob)
+      
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl
+        audioRef.current.play()
+        setIsPlaying(true)
+      }
     }
   }
 
@@ -121,16 +145,23 @@ export default function DashboardPage() {
   const handlePlayHistoryAudio = (audioUrl: string) => {
     if (!audioUrl) return
     
-    // Play from base64
-    const audioBlob = new Blob(
-      [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
-      { type: 'audio/mp3' }
-    )
-    const url = URL.createObjectURL(audioBlob)
-    
-    if (audioRef.current) {
-      audioRef.current.src = url
-      audioRef.current.play()
+    if (isPlaying && audioRef.current) {
+      // Pause the audio
+      audioRef.current.pause()
+      setIsPlaying(false)
+    } else {
+      // Play from base64
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
+        { type: 'audio/mp3' }
+      )
+      const url = URL.createObjectURL(audioBlob)
+      
+      if (audioRef.current) {
+        audioRef.current.src = url
+        audioRef.current.play()
+        setIsPlaying(true)
+      }
     }
   }
 
@@ -260,8 +291,8 @@ export default function DashboardPage() {
                       onClick={handlePlayAudio}
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                     >
-                      <Play size={20} />
-                      {t('play')}
+                      {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                      {isPlaying ? t('pause') : t('play')}
                     </button>
                     <button
                       onClick={handleDownload}
@@ -315,8 +346,8 @@ export default function DashboardPage() {
                             onClick={() => handlePlayHistoryAudio(item.audio_url)}
                             className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition"
                           >
-                            <Play size={14} />
-                            {t('play')}
+                            {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                            {isPlaying ? t('pause') : t('play')}
                           </button>
                           <button
                             onClick={() => handleDownloadHistoryAudio(item.audio_url, item.id)}
