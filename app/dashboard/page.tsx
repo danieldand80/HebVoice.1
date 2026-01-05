@@ -111,36 +111,60 @@ export default function DashboardPage() {
     URL.revokeObjectURL(url)
   }
 
-  const handlePlayHistoryAudio = (audioBase64: string) => {
-    if (!audioBase64) return
+  const handlePlayHistoryAudio = (audioUrl: string) => {
+    if (!audioUrl) return
     
-    const audioBlob = new Blob(
-      [Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))],
-      { type: 'audio/mp3' }
-    )
-    const audioUrl = URL.createObjectURL(audioBlob)
-    
-    if (audioRef.current) {
-      audioRef.current.src = audioUrl
-      audioRef.current.play()
+    // If it's a Supabase Storage URL, use it directly
+    if (audioUrl.startsWith('http')) {
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl
+        audioRef.current.play()
+      }
+    } else {
+      // Fallback for old base64 format
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
+        { type: 'audio/mp3' }
+      )
+      const url = URL.createObjectURL(audioBlob)
+      
+      if (audioRef.current) {
+        audioRef.current.src = url
+        audioRef.current.play()
+      }
     }
   }
 
-  const handleDownloadHistoryAudio = (audioBase64: string, id: string) => {
-    if (!audioBase64) return
+  const handleDownloadHistoryAudio = async (audioUrl: string, id: string) => {
+    if (!audioUrl) return
     
-    const audioBlob = new Blob(
-      [Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0))],
-      { type: 'audio/mp3' }
-    )
-    const url = URL.createObjectURL(audioBlob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `hebvoice-${id}.mp3`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    if (audioUrl.startsWith('http')) {
+      // Download from Supabase Storage URL
+      const response = await fetch(audioUrl)
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `hebvoice-${id}.mp3`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    } else {
+      // Fallback for old base64 format
+      const audioBlob = new Blob(
+        [Uint8Array.from(atob(audioUrl), c => c.charCodeAt(0))],
+        { type: 'audio/mp3' }
+      )
+      const url = URL.createObjectURL(audioBlob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `hebvoice-${id}.mp3`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    }
   }
 
   const handleLogout = async () => {

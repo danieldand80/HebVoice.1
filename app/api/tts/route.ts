@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateSpeech } from '@/lib/google-tts'
-import { supabase } from '@/lib/supabase'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,26 +32,57 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Save to database if user is authenticated
+    // Save to Supabase Storage if user is authenticated
+    let audioUrl = null
     if (userId && result.audioBase64) {
       try {
-        await supabase.from('tts_requests').insert({
-          user_id: userId,
-          text: text.substring(0, 200), // Save first 200 chars
-          voice,
-          speed,
-          character_count: text.length,
-          audio_url: result.audioBase64, // Save base64 audio
-        })
+        const supabase = createRouteHandlerClient({ cookies })
+        
+        // Convert base64 to buffer
+        const audioBuffer = Buffer.from(result.audioBase64, 'base64')
+        
+        // Generate unique filename
+        const fileName = `${userId}/${Date.now()}.mp3`
+        
+        // Upload to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('audio-files')
+          .upload(fileName, audioBuffer, {
+            contentType: 'audio/mp3',
+            cacheControl: '3600',
+            upsert: false
+          })
+
+        if (uploadError) {
+          console.error('Storage upload error:', uploadError)
+        } else {
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('audio-files')
+            .getPublicUrl(fileName)
+          
+          audioUrl = publicUrl
+          
+          // Save metadata to database
+          await supabase.from('tts_requests').insert({
+            user_id: userId,
+            text: text.substring(0, 200),
+            voice,
+            speed,
+            character_count: text.length,
+            audio_url: publicUrl,
+          })
+        }
       } catch (dbError) {
-        console.error('Database save error:', dbError)
-        // Don't fail the request if DB save fails
+        console.error('Database/Storage save error:', dbError)
+        // Don't fail the request if save fails
       }
     }
 
     return NextResponse.json({
       success: true,
-      audioBase64: result.audioBase64,
+      audioBase64: result.audioBase64, // Still return for immediate playback
+      audioUrl, // Public URL for future access
       characterCount: text.length,
     })
   } catch (error: any) {
