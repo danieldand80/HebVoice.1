@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Volume2, Zap, Shield, Globe } from 'lucide-react'
+import Link from 'next/link'
 import AuthSection from '@/components/AuthSection'
 import ThemeToggle from '@/components/ThemeToggle'
 import LanguageToggle from '@/components/LanguageToggle'
@@ -107,10 +108,6 @@ function DemoForm() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const handleCreateVoice = () => {
-    window.location.href = '/dashboard'
-  }
-
   if (loading) {
     return (
       <div className="flex justify-center py-8">
@@ -141,12 +138,12 @@ function DemoForm() {
           </p>
         </div>
       </div>
-      <button
-        onClick={handleCreateVoice}
-        className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-medium rounded-full hover:shadow-xl transition transform hover:scale-105"
+      <Link
+        href="/dashboard"
+        className="inline-block px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-lg font-medium rounded-full hover:shadow-xl transition transform hover:scale-105"
       >
         {t('goToDashboard')} →
-      </button>
+      </Link>
     </div>
   )
 }
