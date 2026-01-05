@@ -40,8 +40,6 @@ export default function LandingPage() {
           <p className="text-lg text-gray-500 dark:text-gray-400 mb-12">
             {t('description')}
           </p>
-          
-          <AuthButton />
         </div>
 
         {/* Features */}
