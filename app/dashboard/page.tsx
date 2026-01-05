@@ -4,8 +4,12 @@ import { useState, useEffect, useRef } from 'react'
 import { Volume2, Download, History, Settings, LogOut, Play, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { VOICES, SPEEDS } from '@/lib/google-tts'
+import { useTranslation } from '@/hooks/useTranslation'
+import ThemeToggle from '@/components/ThemeToggle'
+import LanguageToggle from '@/components/LanguageToggle'
 
 export default function DashboardPage() {
+  const { t } = useTranslation()
   const [text, setText] = useState('')
   const [voice, setVoice] = useState(VOICES[0].id)
   const [speed, setSpeed] = useState(SPEEDS[1].id)
@@ -124,13 +128,17 @@ export default function DashboardPage() {
               <Volume2 className="text-purple-600" />
               <span>HebVoice</span>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            >
-              <LogOut size={20} />
-              התנתק
-            </button>
+            <div className="flex items-center gap-3">
+              <LanguageToggle />
+              <ThemeToggle />
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                <LogOut size={20} />
+                {t('logout')}
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -140,22 +148,22 @@ export default function DashboardPage() {
           {/* Main Editor */}
           <div className="lg:col-span-2">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold mb-6 dark:text-white">צור קול חדש</h2>
+              <h2 className="text-2xl font-bold mb-6 dark:text-white">{t('createNew')}</h2>
               
               <textarea
                 className="w-full h-48 p-4 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none mb-2 resize-none"
-                placeholder="הדבק את הטקסט שלך כאן..."
+                placeholder={t('pasteText')}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 maxLength={5000}
               />
               <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-left">
-                {text.length} / 5000 תווים
+                {text.length} / 5000 {t('charactersCount')}
               </div>
 
               <div className="grid md:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2 dark:text-gray-200">בחר קול</label>
+                  <label className="block text-sm font-medium mb-2 dark:text-gray-200">{t('selectVoice')}</label>
                   <select
                     className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none"
                     value={voice}
@@ -168,7 +176,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 dark:text-gray-200">מהירות דיבור</label>
+                  <label className="block text-sm font-medium mb-2 dark:text-gray-200">{t('selectSpeed')}</label>
                   <select
                     className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:border-purple-500 focus:outline-none"
                     value={speed}
@@ -189,38 +197,38 @@ export default function DashboardPage() {
                 {loading ? (
                   <>
                     <Loader2 className="animate-spin" size={20} />
-                    מייצר קול...
+                    {t('generating')}
                   </>
                 ) : (
-                  'צור קול'
+                  t('createVoice')
                 )}
               </button>
 
               {error && (
-                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+                <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200">
                   {error}
                 </div>
               )}
 
               {audioBase64 && !error && (
-                <div className="mt-6 p-4 bg-green-50 rounded-lg">
+                <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-green-800 font-medium">הקול נוצר בהצלחה! 🎉</span>
+                    <span className="text-green-800 dark:text-green-200 font-medium">{t('success')} 🎉</span>
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={handlePlayAudio}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
                     >
                       <Play size={20} />
-                      השמע
+                      {t('play')}
                     </button>
                     <button
                       onClick={handleDownload}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
                     >
                       <Download size={20} />
-                      הורד MP3
+                      {t('download')}
                     </button>
                   </div>
                 </div>
@@ -233,13 +241,13 @@ export default function DashboardPage() {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-2 dark:text-white">
                 <History size={24} />
-                היסטוריה
+                {t('history')}
               </h3>
 
               <div className="space-y-3">
                 {history.length === 0 ? (
                   <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                    עדיין לא יצרת קולות
+                    {t('noVoicesYet')}
                   </p>
                 ) : (
                   history.map((item) => (
@@ -255,7 +263,7 @@ export default function DashboardPage() {
                           {new Date(item.created_at).toLocaleDateString('he-IL')}
                         </p>
                         <p className="text-xs text-purple-600 dark:text-purple-400">
-                          {item.character_count} תווים
+                          {item.character_count} {t('characters')}
                         </p>
                       </div>
                     </div>
@@ -268,15 +276,15 @@ export default function DashboardPage() {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mt-6">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-2 dark:text-white">
                 <Settings size={24} />
-                סטטיסטיקה
+                {t('statistics')}
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-300">קולות שנוצרו</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('voicesCreated')}</span>
                   <span className="font-bold text-2xl text-purple-600 dark:text-purple-400">{history.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600 dark:text-gray-300">סה"כ תווים</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('totalCharacters')}</span>
                   <span className="font-bold text-2xl text-purple-600 dark:text-purple-400">
                     {history.reduce((sum, item) => sum + (item.character_count || 0), 0)}
                   </span>

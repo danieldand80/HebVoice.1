@@ -40,6 +40,8 @@ export const translations = {
     play: 'השמע',
     download: 'הורד MP3',
     characters: 'תווים',
+    pasteText: 'הדבק את הטקסט שלך כאן...',
+    charactersCount: 'תווים',
     
     // Footer
     rights: '© 2026 HebVoice. כל הזכויות שמורות.',
@@ -85,6 +87,8 @@ export const translations = {
     play: 'Play',
     download: 'Download MP3',
     characters: 'characters',
+    pasteText: 'Paste your text here...',
+    charactersCount: 'characters',
     
     // Footer
     rights: '© 2026 HebVoice. All rights reserved.',
