@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Volume2, Zap, Shield, Globe } from 'lucide-react'
 import AuthSection from '@/components/AuthSection'
 import ThemeToggle from '@/components/ThemeToggle'
 import LanguageToggle from '@/components/LanguageToggle'
 import { useTranslation } from '@/hooks/useTranslation'
+import { supabase } from '@/lib/supabase'
 
 export default function LandingPage() {
   const { t } = useTranslation()
@@ -88,13 +89,49 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode; titl
 
 function DemoForm() {
   const [text, setText] = useState('')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
 
+  useEffect(() => {
+    // Check auth status
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsAuthenticated(!!user)
+      setLoading(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session?.user)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
   const handleCreateVoice = () => {
-    // Always redirect to dashboard - it will handle auth
     window.location.href = '/dashboard'
   }
 
+  if (loading) {
+    return (
+      <div className="flex justify-center py-8">
+        <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // If not authenticated - show login message
+  if (!isAuthenticated) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
+          {t('toGenerateVoice')}
+        </p>
+        <AuthSection />
+      </div>
+    )
+  }
+
+  // If authenticated - show full form
   return (
     <div className="space-y-4">
       <textarea

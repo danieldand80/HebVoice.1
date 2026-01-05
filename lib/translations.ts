@@ -23,6 +23,7 @@ export const translations = {
     createVoice: 'צור קול',
     loginToSave: 'התחבר כדי לשמור ולהוריד את הקבצים שלך',
     pleaseLogin: 'אנא התחבר קודם כדי ליצור קולות',
+    toGenerateVoice: 'כדי ליצור קול, התחבר עם Google',
     
     // Dashboard
     createNew: 'צור קול חדש',
@@ -65,6 +66,7 @@ export const translations = {
     createVoice: 'Create Voice',
     loginToSave: 'Login to save and download your files',
     pleaseLogin: 'Please login first to create voices',
+    toGenerateVoice: 'To generate voice, login with Google',
     
     // Dashboard
     createNew: 'Create New Voice',
